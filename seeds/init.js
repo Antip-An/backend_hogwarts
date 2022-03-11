@@ -9,21 +9,22 @@ exports.seed = async function(knex) {
   await knex('tasks').del()
   await knex('options').del()
 
-
-  await knex('users').insert([
-    {
-      id: 1,
-      name: "Antip",
-      email: "an.an17.5.16@yandex.ru",
-      email_is_confirmed: true,
-      password:12345,
-      role:"admin"
-    }
-  ]);
+  // await knex('users').insert([
+  //   {
+  //     id: 1,
+  //     login: "Admin",
+  //     email: "an.an17.5.16@yandex.ru",
+  //     email_is_confirmed: true,
+  //     password:12345,
+  //     role:"admin",
+  //     active: true
+  //   }
+  // ]);
 
   // await knex('courses').insert([
   //   {
   //     title: "Зельеварение",
+  //     d: "<div>Hello</div><p>I'm <b>tired</b>...</p>",
   //     description: "Зельеварение — учебная дисциплина, изучающая различные зелья, настои, сыворотки и другие жидкие магические субстанции. Зельеварение изучает также свойства этих жидкостей, способы их приготовлений и различные особенности входящих в них ингредиентов."
   //   }
   // ]);

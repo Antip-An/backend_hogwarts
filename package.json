@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "seed": "knex seed:run",
+    "test": "jest"
   },
   "author": "",
   "license": "ISC",
@@ -13,5 +14,8 @@
     "knex": "^1.0.3",
     "pg": "^8.7.3",
     "seed-js": "0.0.11"
+  },
+  "devDependencies": {
+    "jest": "^27.5.1"
   }
 }
