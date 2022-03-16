@@ -8,10 +8,15 @@ exports.changeRole = async ({ userId, role }) => {
         .where({ id: userId });
 
     if (!record) {
-        throw new ControllerException("NOT_FOUND", "User has not been found");
+        throw new ControllerException("USER_NOT_FOUND", "User has not been found");
     }
   
-    await knex("users").update({ role }).where({ id: userId });
+    await knex("users")
+        .update({ 
+            role: role,
+            updated_at: knex.fn.now()
+        })
+        .where({ id: userId });
   
     return {};
 };
@@ -23,33 +28,46 @@ exports.getUserById = async ({ userId }) => {
             "id",
             "login",
             "email",
-            "role",
-            "email_is_confirmed as emailIsConfirmed"
+            "role"
         )
         .where({ id: userId });
-  
+
+    if (!record) {
+        throw new ControllerException("USER_NOT_FOUND", "User has not been found");
+    }
+
     return record;
   };
 
 
-// find user be login (admin)
-exports.getUserById = async ({ login }) => {
+// find user bY login (admin)
+exports.getUserBylogin = async ({ login }) => {
     const [record] = await knex("users")
-        .select("*")
+        .select(
+            "id",
+            "login",
+            "email",
+            "role"
+        )
         .where({ login: login });
+
+    if (!record) {
+        throw new ControllerException("USER_NOT_FOUND", "User has not been found");
+    }
   
     return record;
   };
 
-// get all users (admin) TODO:
+// get all users (admin) 
 exports.getAllUsers = async () => {
     try {
         const [record] = await("users")
-        .select()
+        .select("*") //TODO:
     
     return record
+
     } catch (error) {
-        throw new ControllerException("USERS_NOT_FOUND", "Search Error");
+        throw new ControllerException("INTERNAL_SERVER_ERROR", "Internal server error");
     }
 };
 
@@ -57,7 +75,7 @@ exports.getAllUsers = async () => {
 //freeeze user (admin)
 exports.deactivateProfile = async ({ userId }) => {
     try {
-        const [record] = await knex("users")
+        await knex("users")
             .where({ id: userId })
             .update({ 
                 active: false,
@@ -66,8 +84,7 @@ exports.deactivateProfile = async ({ userId }) => {
         
         return {}
     } catch (error) {
-        throw new ControllerException("USER_ALREADY_DEACTIVATED", "User was already deactivated"); 
-        //TODO: or id - not found?
+        throw new ControllerException("USER_NOT_FOUND", "User has not been found")
     }
 }
 
@@ -83,7 +100,6 @@ exports.activateProfile = async ({ userId }) => {
     
         return {} 
     } catch (error) {
-        throw new ControllerException("USER_ALREADY_ACTIVATED", "User was already activated"); 
-        //TODO: or id - not found?
+        throw new ControllerException("USER_NOT_FOUND", "User has not been found") 
     }
 }

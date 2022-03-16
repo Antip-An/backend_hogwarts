@@ -4,18 +4,18 @@ const knex = require("../utils/db");
 // request email confirmation (user)
 exports.requestEmailConfirmation = async ({ userId }) => {
     // TODO: Generate confirmation code
-    const confirmationCode = "0000";
+    const confirmationCode = "000000";
     const [record] = await knex("users")
         .select("email_is_confirmed as emailIsConfirmed")
         .where({ id: userId })
 
     if (!record) {
-        throw new ControllerException("NOT_FOUND", "User has not been found")
+        throw new ControllerException("USER_NOT_FOUND", "User has not been found")
     } 
 
     if (record.emailIsConfirmed) {
         throw new ControllerException(
-          "ALREADY_CONFIRMED",
+          "EMAIL_ALREADY_CONFIRMED",
           "User has already confirmed their email"
         );
     }
@@ -23,11 +23,49 @@ exports.requestEmailConfirmation = async ({ userId }) => {
     // Write to db
     await knex("users")
         .where("id", userId)
-        .update({email_confirmation_code: confirmationCode}) 
-    
+        .update({
+            email_confirmation_code: confirmationCode,
+            updated_at: knex.fn.now()
+        }) 
+        .returning("email")
     //TODO: Send email
+
     return {}
 };
+
+// confirm emall (user)
+exports.confirmEmail = async ({ userId, confirmationCode }) => {
+    const [record] = await knex("users")
+    .select(
+        "email_is_confirmed as emailIsConfirmed",
+        "email_confirmation_code as emailConfirmationCode"
+    )
+    .where({ id: userId })
+
+    if (
+        !record ||
+        record.emailConfirmationCode === null ||
+        record.emailIsConfirmed ||
+        record.emailConfirmationCode !== confirmationCode
+      ) {
+        throw new ControllerException(
+          "FORBIDDEN",
+          "Wrong userId or confirmationCode"
+        )
+      }
+    
+      await knex("users")
+        .update({ 
+            email_is_confirmed: true, 
+            email_confirmation_code: null,
+            updated_at: knex.fn.now()
+        })
+        .where({ id: userId })
+    
+    return {}
+  
+};
+
 
 // edit profile (user)
 exports.editProfile = async ({ userId, login, email, password }) => {
@@ -36,7 +74,7 @@ exports.editProfile = async ({ userId, login, email, password }) => {
         .where({ id: userId })
 
     if (!record) {
-        throw new ControllerException("NOT_FOUND", "User has not been found")
+        throw new ControllerException("USER_NOT_FOUND", "User has not been found")
     }
 
     const patch = {}
@@ -65,3 +103,23 @@ exports.deleteProfile = async({ userId }) => {
 
     return record
 };
+
+// restore password (user)
+exports.restorePassword = async ({ login }) => {
+    const confirmationCode = "000000"; //TODO: generate 
+    const [{ email: email }] = await knex("users")
+        .where({ login: login})
+        .update({
+            email_confirmation_code: confirmationCode,
+            updated_at: knex.fn.now(),
+    })
+        .returning("email")
+        //TODO: send email
+
+    if (emailConfirmationCode === confirmationCode) {
+        return {}
+    } else {
+        throw new ControllerException("CONFIRMATION_CODE_IS_INVALID", "Confirmation code is invalid")
+    }
+};
+  

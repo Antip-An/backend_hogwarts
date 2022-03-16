@@ -33,37 +33,8 @@ exports.login = async ({ login, password }) => {
         .where({ login, password });
 
     if (!record) {
-        throw new ControllerException("WRONG_CREDENTIALS", "Wrong credentials");
+        throw new ControllerException("USER_NOT_FOUND", "User has not been found");
     }
 
     return { userId: record.id };
-};
-
-// confirm emall (user)
-exports.confirmEmail = async ({ userId, confirmationCode }) => {
-    const [record] = await knex("users")
-    .select(
-        "email_is_confirmed as emailIsConfirmed",
-        "email_confirmation_code as emailConfirmationCode"
-    )
-    .where({ id: userId })
-
-    if (
-        !record ||
-        record.emailConfirmationCode === null ||
-        record.emailIsConfirmed ||
-        record.emailConfirmationCode !== confirmationCode
-      ) {
-        throw new ControllerException(
-          "FORBIDDEN",
-          "Wrong userId or confirmationCode"
-        )
-      }
-    
-      await knex("users")
-        .update({ email_is_confirmed: true, email_confirmation_code: null })
-        .where({ id: userId })
-    
-      return {}
-  
 };
