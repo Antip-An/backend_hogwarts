@@ -66,7 +66,6 @@ exports.confirmEmail = async ({ userId, confirmationCode }) => {
   
 };
 
-
 // edit profile (user)
 exports.editProfile = async ({ userId, login, email, password }) => {
     const [record] = await knex("users")
@@ -85,8 +84,9 @@ exports.editProfile = async ({ userId, login, email, password }) => {
         // TODO: Generate confirmation code
         patch.email_confirmation_code = "0000"
     }
-    // TODO: Hash password
-    if (password) patch.password = password
+    // TODO: 
+    //const hashPassword = bcrypt.hashSync(password, 10)
+    if (password) patch.password = password//.hashPassword
 
     await knex("users").update(patch).where({ 
         id: userId,
@@ -94,14 +94,6 @@ exports.editProfile = async ({ userId, login, email, password }) => {
     })
 
     return {}
-};
-
-// delete profile (user)
-exports.deleteProfile = async({ userId }) => {
-    const [record] = await knex("users")
-        .where({ id: userId }).del()
-
-    return record
 };
 
 // restore password (user)
@@ -123,3 +115,17 @@ exports.restorePassword = async ({ login }) => {
     }
 };
   
+//delete profile (user) TODO:
+exports.deleteCourse = async ({ userId }) => {
+    const [record] = await knex("users")
+        .select("id")
+        .where({ id: userId })
+
+    if (!record) {
+        throw new ControllerException("USER_NOT_FOUND", "User has not been found")
+    } else {
+        await knex("users").where({ id: userId }).del()
+    }
+
+    return {}
+}

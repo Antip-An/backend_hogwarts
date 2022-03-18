@@ -5,12 +5,15 @@
   "main": "index.js",
   "scripts": {
     "seed": "knex seed:run",
-    "test": "jest"
+    "test": "jest",
+    "start": "node server.js"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
     "dotenv": "^16.0.0",
+    "express": "^4.17.3",
+    "jsonwebtoken": "^8.5.1",
     "knex": "^1.0.3",
     "pg": "^8.7.3",
     "seed-js": "0.0.11"

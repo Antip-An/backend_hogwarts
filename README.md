@@ -24,6 +24,9 @@ DB_PORT=_ // integer
 DB_USERNAME='_' // string
 DB_PASSWORD='_' // string
 DB_DATABASE='_' // string
+
+PORT='_' // string
+JWT_SECRET_KEY="_" string
 ```
 5. Запустите миграцию командой 
 >```knex migrate:up```

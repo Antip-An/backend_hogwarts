@@ -28,7 +28,8 @@ exports.getUserById = async ({ userId }) => {
             "id",
             "login",
             "email",
-            "role"
+            "role",
+            "email_is_confirmed AS emailIsConfirmed"
         )
         .where({ id: userId });
 
@@ -62,7 +63,7 @@ exports.getUserBylogin = async ({ login }) => {
 exports.getAllUsers = async () => {
     try {
         const [record] = await("users")
-        .select("*") //TODO:
+        .select("*") 
     
     return record
 
@@ -103,3 +104,4 @@ exports.activateProfile = async ({ userId }) => {
         throw new ControllerException("USER_NOT_FOUND", "User has not been found") 
     }
 }
+

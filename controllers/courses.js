@@ -14,18 +14,19 @@ exports.register = async ({ title, description }) => {
 }
 
 //edit course TODO:
-exports.editCourse = async ({ courseId, title, description }) => {
+exports.editCourse = async ({ courseId, title, description,  certificate}) => {
     const [record] = await knex("courses")
         .select("id", "title", "description", "certificate")
         .where({ id: courseId });
 
     if (!record) {
-        throw new ControllerException("NOT_FOUND", "User has not been found")       
+        throw new ControllerException("COURSE_NOT_FOUND", "Course has not been found")       
     }
 
     const patch = {};
-    if (title !== undefined) patch.name = title; // TODO: ?
-    if (description !== undefined) patch.description = description; // or
+    if (title !== undefined) patch.name = title;
+    if (description !== undefined) patch.description = description; 
+    if (certificate !== undefined) patch.certificate = certificate;
 
     await knex("courses").update(patch).where({ id: courseId });
     return {};
@@ -45,10 +46,10 @@ exports.deleteCourse = async ({ courseId }) => {
 
     return {}
 }
+
 //start course (user) TODO:
 exports.startCourse = async ({ courseId, userId }) => {
     // при начале курса, он переходит в "Мои курсы" для конкретного пользов
-    // как добавть id из двух таблиц в одну
 
     const [recordUser] = await knex("users")
         .select("id")
@@ -78,7 +79,7 @@ exports.startCourse = async ({ courseId, userId }) => {
 }
 
 //hide course - скрыть (user) TODO:
-exports.HideCourse = async ({ courseId, userId }) => {
+exports.hideCourse = async ({ courseId, userId }) => {
     // при скрытии курса, он исчезает из Моих
     // но достижения (прйденные уроки) не пропадут
     try {
@@ -94,7 +95,7 @@ exports.HideCourse = async ({ courseId, userId }) => {
      
         return {} 
     } catch (error) {
-            throw new ControllerException("COURSE_ALREADY_UNSELECTED", "Course was already ubselected"); 
+            throw new ControllerException("COURSE_ALREADY_UNSELECTED", "Course was already unselected"); 
      }
 }
 
@@ -158,7 +159,7 @@ exports.getCourseById = async ({ title }) => {
 exports.getAllCourse = async () => {
     try {
        const [record] = await("courses")
-        .select()
+        .select("*")
     
         return record 
     } catch (error) {
@@ -181,27 +182,73 @@ exports.getMyCourses = async({ userId }) => {
 
     if ("id" = myCourseId) {
         conts [record] = await knex("courses")
-            .select("title")
+            .select("*")
     } else {
         throw new ControllerException("COURSES_NOT_FOUND", "Courses have not been found")
     }
     return record
 };
 
-// add course in my courses (user) TODO:
+// add course in my courses (user) TODO: ?????????????????????????????????????????????????
 exports.addMyCourse = async ({ userId, courseId }) => {
-    try {
-        await knex("user_courses")
-            .where({ 
-                id_users: userId,
-                id_course: courseId
-            })
-            .update({ 
-                selected: true,
-            })
-     
-        return {} 
-    } catch (error) {
-            throw new ControllerException("COURSE_ALREADY_UNSELECTED", "cOURSE was already ubselected"); 
-     }
+    const [user] = await knex("users")
+        .select("id")
+        .where({id: userId})
+
+    if (!user) {
+        throw new ControllerException("USER_NOT_FOUND", "User has not beed founded")
+    }   
+
+    const [course] = await knex("courses")
+        .select("id")
+        .where({id: courseId})
+
+    if (!course) {
+        throw new ControllerException("COURSE_NOT_FOUND", "Course has not beed founded")
+    }
+
+    const [record] = await knex("user_courses")
+        .select(
+            "id_course",
+            "id_user",
+            "start",
+            "end",
+            "selected"
+        )
+        .where({
+            id_user: userId,
+            id_course: courseId
+        })
+    //  поменять start & end на подобее ролей admin/user??? TODO: --------------------------------------------------
+    if (record) { 
+        if (start == true && end == false || start == false && end == true) {
+            if (selected == true) {
+                throw new ControllerException("COURSE_ALREADY_SELECTED", "Course was already selected")
+            }
+            // update - selected:true
+            const [record1] = await knex("user_courses")
+                .select("id_course","id_user", "start", "end", "selected")
+                .where({
+                    id_course: courseId,
+                    id_user: userId
+                })
+                const patch = {};
+            if (selected == false) patch.selected = true;
+            await knex("courses").update(patch).where({ id: courseId });
+        } else {
+            throw new ControllerException("SERVER_ERROR", "")
+        }
+    } else {
+        // insert
+        const [{ id_user: userId, id_course: courseId }] = await knex("user_courses")
+            .insert([{ 
+                id_course, 
+                id_user,
+                start: false, 
+                end: false, 
+                selected: true 
+            }]) 
+    }
+
+    return {}
 }
