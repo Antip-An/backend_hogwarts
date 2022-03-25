@@ -2,7 +2,7 @@ const ControllerException = require("../utils/ControllerException");
 const knex = require("../utils/db");
 
 //create course (admin)
-exports.register = async ({ title, description }) => {
+exports.createCourse = async ({ title, description }) => {
     try {
         const [{ id: courseId }] = await knex("courses")
         .insert([{ title, description }])
@@ -13,10 +13,10 @@ exports.register = async ({ title, description }) => {
   }
 }
 
-//edit course TODO:
-exports.editCourse = async ({ courseId, title, description,  certificate}) => {
+//edit course
+exports.editCourse = async ({ courseId, title, description}) => {
     const [record] = await knex("courses")
-        .select("id", "title", "description", "certificate")
+        .select("id", "title", "description")
         .where({ id: courseId });
 
     if (!record) {
@@ -26,13 +26,12 @@ exports.editCourse = async ({ courseId, title, description,  certificate}) => {
     const patch = {};
     if (title !== undefined) patch.name = title;
     if (description !== undefined) patch.description = description; 
-    if (certificate !== undefined) patch.certificate = certificate;
 
     await knex("courses").update(patch).where({ id: courseId });
     return {};
 };
 
-//delete course (admin) TODO:
+//delete course (admin)
 exports.deleteCourse = async ({ courseId }) => {
     const [record] = await knex("courses")
         .select("id")
@@ -71,8 +70,7 @@ exports.startCourse = async ({ courseId, userId }) => {
         .insert([{ 
             id_course, 
             id_user,
-            start: true, 
-            end: false, 
+            status: "start", 
             selected: true 
         }]) 
     return {}
@@ -82,6 +80,7 @@ exports.startCourse = async ({ courseId, userId }) => {
 exports.hideCourse = async ({ courseId, userId }) => {
     // при скрытии курса, он исчезает из Моих
     // но достижения (прйденные уроки) не пропадут
+    // проверка существования курса
     try {
         await knex("user_courses")
             .where({ 
@@ -99,37 +98,27 @@ exports.hideCourse = async ({ courseId, userId }) => {
      }
 }
 
-//end (user) and get certificate TODO:
-// exports.endCourse = async ({ courseId, userId }) => {
-//     // курс пропадает из моих курсов
-//     // СДЕЛАТЬ ОТДЕЛЬНО END И certificate
-//     const [recordUserCourse] = await knex("user_courses")
-//         .where({
-//             id_users: userId,
-//             id_course: courseId,
-//             start:true
-//         })
-//         .update({
-//             start:false,
-//             end: true
-//         })
-    
-//     if (!recordUserCourse) {
-//         throw new ControllerException("USER_COURSE_NOT_FOUND", "User_Course not found");
-//     }
+// end course (user) TODO:
+exports.endCourse = async ({ courseId, userId }) => {
 
-//     const [recordCourse] = await knex("courses")
-//         .select("sertificate")
-//         .where({ id: courseId })
+    const [recordUserCourse] = await knex("user_courses")
+        .where({
+            id_users: userId,
+            id_course: courseId,
+            status: "start"
+        })
+        .update({
+            status: "end"
+        })
 
-//     if (!recordCourse) {
-//         throw new ControllerException("COURSE_NOT_FOUND", "Course not found");
-//     }
-    
-//     return recordCourse
-// }
+    if (!recordUserCourse) {
+        throw new ControllerException("USER_COURSE_NOT_FOUND", "User_Course not found");
+    }
 
-// find course by id TODO:
+}
+
+
+// find course by id (admin) TODO:
 exports.getCourseById = async ({ courseId }) => {
     const [record] = await knex("courses")
         .select("*")
@@ -155,7 +144,8 @@ exports.getCourseById = async ({ title }) => {
     return record;
 };
 
-//get all course TODO:
+//get all course
+// limit TODO:
 exports.getAllCourse = async () => {
     try {
        const [record] = await("courses")
@@ -189,7 +179,7 @@ exports.getMyCourses = async({ userId }) => {
     return record
 };
 
-// add course in my courses (user) TODO: ?????????????????????????????????????????????????
+// add course in my courses not start (user) TODO:
 exports.addMyCourse = async ({ userId, courseId }) => {
     const [user] = await knex("users")
         .select("id")
@@ -211,41 +201,35 @@ exports.addMyCourse = async ({ userId, courseId }) => {
         .select(
             "id_course",
             "id_user",
-            "start",
-            "end",
+            "status",
             "selected"
         )
         .where({
             id_user: userId,
             id_course: courseId
         })
-    //  поменять start & end на подобее ролей admin/user??? TODO: --------------------------------------------------
+
     if (record) { 
-        if (start == true && end == false || start == false && end == true) {
-            if (selected == true) {
-                throw new ControllerException("COURSE_ALREADY_SELECTED", "Course was already selected")
-            }
-            // update - selected:true
-            const [record1] = await knex("user_courses")
-                .select("id_course","id_user", "start", "end", "selected")
-                .where({
-                    id_course: courseId,
-                    id_user: userId
-                })
-                const patch = {};
-            if (selected == false) patch.selected = true;
-            await knex("courses").update(patch).where({ id: courseId });
-        } else {
-            throw new ControllerException("SERVER_ERROR", "")
+        if (selected == true) {
+            throw new ControllerException("COURSE_ALREADY_SELECTED", "Course was already selected")
         }
+        // update - selected:true
+        await knex("user_courses")
+            .select("id_course","id_user", "status", "selected")
+            .where({
+                 id_course: courseId,
+                 id_user: userId
+            })
+            const patch = {};
+        if (selected == false) patch.selected = true;
+        await knex("courses").update(patch).where({ id: courseId });
+        
     } else {
-        // insert
         const [{ id_user: userId, id_course: courseId }] = await knex("user_courses")
             .insert([{ 
                 id_course, 
                 id_user,
-                start: false, 
-                end: false, 
+                status: "nothing",
                 selected: true 
             }]) 
     }

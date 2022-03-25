@@ -19,7 +19,6 @@ exports.up = async (knex) => {
         table.increments("id");
         table.string("title").unique().notNullable();
         table.text("description").notNullable();
-        table.string("certificate");
     });
 
     await knex.schema.createTable("user_course", (table) => {

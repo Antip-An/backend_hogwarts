@@ -18,6 +18,8 @@ beforeEach(async () => {
   await db.seed.run();
 });
 
+// allusers
+
 test("Can register user", async () => {
   const data = await allusersController.register(users[0]);
 
@@ -71,3 +73,8 @@ test("Cannot login user", async () => {
   expect(result.exceptionCode).toBe("USER_NOT_FOUND");
 })
 
+// users
+
+
+
+//admin

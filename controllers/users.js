@@ -84,9 +84,8 @@ exports.editProfile = async ({ userId, login, email, password }) => {
         // TODO: Generate confirmation code
         patch.email_confirmation_code = "0000"
     }
-    // TODO: 
-    //const hashPassword = bcrypt.hashSync(password, 10)
-    if (password) patch.password = password//.hashPassword
+
+    if (password) patch.password = password
 
     await knex("users").update(patch).where({ 
         id: userId,
@@ -96,7 +95,7 @@ exports.editProfile = async ({ userId, login, email, password }) => {
     return {}
 };
 
-// restore password (user)
+// restore password (user) TODO:
 exports.restorePassword = async ({ login }) => {
     const confirmationCode = "000000"; //TODO: generate 
     const [{ email: email }] = await knex("users")

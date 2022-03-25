@@ -4,8 +4,6 @@ const knex = require("../utils/db");
 // register (any)
 exports.register = async ({ login, email, password }) => {
     // TODO: Hash password 
-    //const hashPassword = bcrypt.hashSync(password, 10)
-
     const [recordLogin] = await knex("users")
       .select("id")
       .where({ login: login})
@@ -24,7 +22,7 @@ exports.register = async ({ login, email, password }) => {
       .insert([{ 
         login, 
         email, 
-        password//:hashPassword
+        password
       }]) 
       .returning("id")
     return { userId }
@@ -34,13 +32,11 @@ exports.register = async ({ login, email, password }) => {
 // login (any)
 exports.login = async ({ login, password }) => {
     // TODO: Hash password
-    //const hashPassword = bcrypt.hashSync(password, 10)
-
     const [record] = await knex("users")
         .select("id")
         .where({ 
           login, 
-          password//:hashPassword
+          password
         });
 
     if (!record) {
