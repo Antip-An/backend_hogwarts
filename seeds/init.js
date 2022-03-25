@@ -8,19 +8,19 @@ exports.seed = async function(knex) {
   await knex('tasks').del()
   await knex('tests').del()
   await knex('lessons').del()
-  await knex('users').del()
+  // await knex('users').del()
   await knex('courses').del()
 
-  await knex('users').insert([
-    {
-      id: 1,
-      login: "Admin",
-      email: "an.an17.5.16@yandex.ru",
-      email_is_confirmed: true,
-      password:12345,
-      role:"admin"
-    }
-  ]);
+  // await knex('users').insert([
+  //   {
+  //     id: 1,
+  //     login: "Admin",
+  //     email: "an.an17.5.16@yandex.ru",
+  //     email_is_confirmed: true,
+  //     password:12345,
+  //     role:"admin"
+  //   }
+  // ]);
 
   await knex('courses').insert([
     {

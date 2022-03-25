@@ -10,10 +10,8 @@ const validate = require("./middlewares/validate");
 
 const router = express.Router();
 
-//TODO:
 router.post(
   "/signup",
-  //auth("admin"),
   wrap(async (req, res) => {
     const { login, email, password } = req.body;
     const { userId } = await allusersController.register({login, email, password});
@@ -23,6 +21,23 @@ router.post(
     res.send({ success: true, token });
   })
 );
+
+//TODO:
+
+router.post(
+  "/signin",
+  //auth("admin"),
+  wrap(async (req, res) => {
+    const { login,password } = req.body;
+    const { userId } = await allusersController.login({login, password});
+
+    const token = signToken(userId);
+
+    res.send({ success: true, token });
+  })
+);
+
+
 
 
 
