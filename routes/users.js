@@ -10,6 +10,8 @@ const validate = require("./middlewares/validate");
 
 const router = express.Router();
 
+//allusers 
+
 router.post(
   "/signup",
   wrap(async (req, res) => {
@@ -22,14 +24,14 @@ router.post(
   })
 );
 
-//TODO:
-
 router.post(
   "/signin",
-  //auth("admin"),
+  body("login").isString(),
+  body("password").isString(),
+  validate(),
   wrap(async (req, res) => {
     const { login,password } = req.body;
-    const { userId } = await allusersController.login({login, password});
+    const { userId } = await allusersController.login({ login, password });
 
     const token = signToken(userId);
 
@@ -37,49 +39,30 @@ router.post(
   })
 );
 
-
-
-
+//users TODO:
 
 // router.post(
-//   "/email/confirm/request",
-//   auth("user"),
-//   wrap(async (req, res) => {
-//     await usersController.requestEmailConfirmation({ userId: req.user.id });
-//     res.send({ success: true });
-//   })
-// );
+  //   "/email/confirm/request",
+  //   auth("user"),
+  //   wrap(async (req, res) => {
+  //     await usersController.requestEmailConfirmation({ userId: req.user.id });
+  //     res.send({ success: true });
+  //   })
+  // );
+  
+  // router.get(
+  //   "/email/confirm",
+  //   wrap(async (req, res) => {
+  //     const { user, code } = req.query;
+  //     await usersController.requestEmailConfirmation({
+  //       userId: user,
+  //       confirmationCode: code,
+  //     });
+  //     res.send({ success: true });
+  //   })
+  // );
 
-// router.get(
-//   "/email/confirm",
-//   wrap(async (req, res) => {
-//     const { user, code } = req.query;
-//     await usersController.requestEmailConfirmation({
-//       userId: user,
-//       confirmationCode: code,
-//     });
-//     res.send({ success: true });
-//   })
-// );
-
-// router.post(
-//   "/login",
-//   body("email").isEmail(),
-//   body("password").isString(),
-//   validate(),
-//   wrap(async (req, res) => {
-//     const { email, password } = req.body;
-//     const { userId, userRole } = await usersController.login({
-//       email,
-//       password,
-//     });
-
-//     const token = signToken(userId);
-//     res.send({ success: true, token, role: userRole });
-//   })
-// );
-
-// router.post(
+  // router.post(
 //   "/profile/edit",
 //   auth("user"),
 //   wrap(async (req, res) => {
@@ -94,6 +77,52 @@ router.post(
 //     res.send({ success: true });
 //   })
 // );
+
+// restore password
+
+//delete profile
+
+//admin TODO:
+
+router.get(
+  "/one/:id",
+  // auth("admin"),
+  wrap(async (req, res) => {
+    const { id } = req.params;
+    const user = await adminController.getUserById({ userId: id });
+
+    res.send({
+      success: true,
+      user: { id: user.id, login: user.login, email: user.email },
+    });
+  })
+);
+
+//TODO: не робит
+router.get(
+  "/one/login",
+  //auth("admin"),
+  wrap(async (req, res) => {
+    const { login } = req.params;
+    const user = await adminController.getUserBylogin({ login: login });
+
+    res.send({
+      success: true,
+      user: { id: user.id, login: user.login, email: user.email },
+    });
+  })
+);
+
+//TODO: не робит
+router.get(
+  "/getAllUsers",
+  //auth("admin"),
+  wrap(async (req, res) => {
+    const users = await adminController.getAllUsers();
+
+    res.send({ success: true, users });
+  })
+);
 
 // router.post(
 //   "/role/change",
@@ -111,36 +140,10 @@ router.post(
 //   })
 // );
 
-// router.get(
-//   "/one/:id",
-//   wrap(async (req, res) => {
-//     const { id } = req.params;
-//     const user = await usersController.getUserById({ userId: id });
+//deactivateProfile
 
-//     res.send({
-//       success: true,
-//       user: { id: user.id, name: user.name, email: user.email },
-//     });
-//   })
-// );
+//activateProfile
 
-// router.get(
-//   "/list",
-//   auth("admin"),
-//   wrap(async (req, res) => {
-//     const { limit, offset } = req.params;
-//     const users = await usersController.getUserById({
-//       limit: +limit || 10,
-//       offset: +offset || 0,
-//     });
 
-//     res.send({
-//       success: true,
-//       users,
-//       limit,
-//       offset,
-//     });
-//   })
-// );
 
 module.exports = router;

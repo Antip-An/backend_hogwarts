@@ -37,15 +37,26 @@ exports.login = async ({ login, password }) => {
   const [record] = await knex("users")
     .select("id", "password as hashedPassword")
     .where({
-      login, // bacrypt compare
+      login,
     });
 
   if (!record) {
     throw new ControllerException("USER_NOT_FOUND", "User has not been found");
   }
 
+  // TODO: проверить работу active
+  const [active] = await knex("users")
+    .select("active")
+    .where({
+      login,
+    });
+
+  if (!active) {
+    throw new ControllerException("USER_IS_N0T_ACTIVE)", "User is not active");
+  }
+
   if (bcrypt.compare(password, record.hashedPassword)) {
+    // bcrypt compare
     return { userId: record.id };
   }
-  
 };

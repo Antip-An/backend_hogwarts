@@ -2,18 +2,38 @@ const ControllerException = require("../utils/ControllerException");
 const knex = require("../utils/db");
 
 //create course (admin)
+// exports.createCourse = async ({ title, description }) => {
+//     try {
+//         const [{ id: courseId }] = await knex("courses")
+//         .insert([{ title, description }])
+//         .returning("id");
+//         return { courseId };
+//     } catch (error) {
+//         throw new ControllerException("COURSE_WAS_CREATED", "Course was created")
+//   }
+// }
+
+//create course (admin)
 exports.createCourse = async ({ title, description }) => {
-    try {
-        const [{ id: courseId }] = await knex("courses")
-        .insert([{ title, description }])
-        .returning("id");
-        return { courseId };
-    } catch (error) {
-        throw new ControllerException("COURSE_WAS_CREATED", "Course was created")
+    const [record] = await knex("courses")
+    .select("id")
+    .where({ title: title });
+  if (record) {
+    throw new ControllerException("TITLE_IN_USE", "Title is already in use");
   }
+
+  const [{ id: courseId }] = await knex("courses")
+    .insert([
+      {
+        title,
+        description
+      },
+    ])
+    .returning("id");
+  return { courseId };
 }
 
-//edit course
+//edit course (admin)
 exports.editCourse = async ({ courseId, title, description}) => {
     const [record] = await knex("courses")
         .select("id", "title", "description")
@@ -66,7 +86,7 @@ exports.startCourse = async ({ courseId, userId }) => {
         throw new ControllerException("COURSE_NOT_FOUND", "Course is not found");         
     }
 
-    const [{ id_user: userId, id_course: courseId }] = await knex("user_courses")
+    await knex("user_courses")
         .insert([{ 
             id_course, 
             id_user,
@@ -170,7 +190,7 @@ exports.getMyCourses = async({ userId }) => {
             selected: true
          })
 
-    if ("id" = myCourseId) {
+    if ("id" === myCourseId) {
         conts [record] = await knex("courses")
             .select("*")
     } else {

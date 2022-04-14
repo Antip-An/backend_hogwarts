@@ -1,12 +1,19 @@
 const express = require("express");
 const userRouter = require("./users");
-//TODO:
+// const courseRouter = require("./courses");
+// const lesonRouter = require("./lessons");
+// const testRouter = require("./tests");
+// const taskRouter = require("./tasks");
 
 const router = express.Router();
 
 router.use(express.json());
 
 router.use("/users", userRouter);
+// router.use("/courses", courseRouter);
+// router.use("/lessons", lesonRouter);
+// router.use("/tests", testRouter);
+// router.use("/tasks", taskRouter);
 
 router.use((req, res) => {
   res.send({ success: false, code: "NOT_IMPLEMENTED" });
