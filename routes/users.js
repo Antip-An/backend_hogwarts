@@ -10,13 +10,17 @@ const validate = require("./middlewares/validate");
 
 const router = express.Router();
 
-//allusers 
+//allusers
 
 router.post(
   "/signup",
   wrap(async (req, res) => {
     const { login, email, password } = req.body;
-    const { userId } = await allusersController.register({login, email, password});
+    const { userId } = await allusersController.register({
+      login,
+      email,
+      password,
+    });
 
     const token = signToken(userId);
 
@@ -26,12 +30,12 @@ router.post(
 
 router.post(
   "/signin",
-  body("login").isString(),
+  body("email").isString(),
   body("password").isString(),
   validate(),
   wrap(async (req, res) => {
-    const { login,password } = req.body;
-    const { userId } = await allusersController.login({ login, password });
+    const { email, password } = req.body;
+    const { userId } = await allusersController.login({ email, password });
 
     const token = signToken(userId);
 
@@ -42,27 +46,27 @@ router.post(
 //users TODO:
 
 // router.post(
-  //   "/email/confirm/request",
-  //   auth("user"),
-  //   wrap(async (req, res) => {
-  //     await usersController.requestEmailConfirmation({ userId: req.user.id });
-  //     res.send({ success: true });
-  //   })
-  // );
-  
-  // router.get(
-  //   "/email/confirm",
-  //   wrap(async (req, res) => {
-  //     const { user, code } = req.query;
-  //     await usersController.requestEmailConfirmation({
-  //       userId: user,
-  //       confirmationCode: code,
-  //     });
-  //     res.send({ success: true });
-  //   })
-  // );
+//   "/email/confirm/request",
+//   auth("user"),
+//   wrap(async (req, res) => {
+//     await usersController.requestEmailConfirmation({ userId: req.user.id });
+//     res.send({ success: true });
+//   })
+// );
 
-  // router.post(
+// router.get(
+//   "/email/confirm",
+//   wrap(async (req, res) => {
+//     const { user, code } = req.query;
+//     await usersController.requestEmailConfirmation({
+//       userId: user,
+//       confirmationCode: code,
+//     });
+//     res.send({ success: true });
+//   })
+// );
+
+// router.post(
 //   "/profile/edit",
 //   auth("user"),
 //   wrap(async (req, res) => {
@@ -143,7 +147,5 @@ router.get(
 //deactivateProfile
 
 //activateProfile
-
-
 
 module.exports = router;

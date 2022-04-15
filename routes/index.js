@@ -1,6 +1,6 @@
 const express = require("express");
 const userRouter = require("./users");
-// const courseRouter = require("./courses");
+const courseRouter = require("./courses");
 // const lesonRouter = require("./lessons");
 // const testRouter = require("./tests");
 // const taskRouter = require("./tasks");
@@ -10,7 +10,7 @@ const router = express.Router();
 router.use(express.json());
 
 router.use("/users", userRouter);
-// router.use("/courses", courseRouter);
+router.use("/courses", courseRouter);
 // router.use("/lessons", lesonRouter);
 // router.use("/tests", testRouter);
 // router.use("/tasks", taskRouter);

@@ -2,7 +2,6 @@ const express = require("express");
 const { wrap } = require("async-middleware");
 const { body } = require("express-validator");
 const courseController = require("../controllers/courses");
-const { sign: signToken } = require("../utils/token");
 const auth = require("./middlewares/auth");
 const validate = require("./middlewares/validate");
 
@@ -41,3 +40,5 @@ router.post(
 // add course in my courses - is not start (user)
 
 // get all my courses (user)
+
+module.exports = router;

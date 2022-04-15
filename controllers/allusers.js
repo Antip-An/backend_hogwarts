@@ -33,11 +33,11 @@ exports.register = async ({ login, email, password }) => {
 };
 
 // login (any)
-exports.login = async ({ login, password }) => {
+exports.login = async ({ email, password }) => {
   const [record] = await knex("users")
     .select("id", "password as hashedPassword")
     .where({
-      login,
+      email,
     });
 
   if (!record) {
