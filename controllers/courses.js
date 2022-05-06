@@ -2,18 +2,6 @@ const ControllerException = require("../utils/ControllerException");
 const knex = require("../utils/db");
 
 //create course (admin)
-// exports.createCourse = async ({ title, description }) => {
-//     try {
-//         const [{ id: courseId }] = await knex("courses")
-//         .insert([{ title, description }])
-//         .returning("id");
-//         return { courseId };
-//     } catch (error) {
-//         throw new ControllerException("COURSE_WAS_CREATED", "Course was created")
-//   }
-// }
-
-//create course (admin)
 exports.createCourse = async ({ title, description }) => {
     const [record] = await knex("courses")
     .select("id")

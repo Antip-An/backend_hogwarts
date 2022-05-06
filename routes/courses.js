@@ -25,8 +25,6 @@ router.post(
 
 //edit course (admin)
 
-//delete course (admin)
-
 // find course by title (user)
 
 //get all course (user)
@@ -40,5 +38,17 @@ router.post(
 // add course in my courses - is not start (user)
 
 // get all my courses (user)
+
+//delete course (admin)
+router.delete(
+  "/deleteCourse",
+  //auth("admin"),
+  wrap(async (req, res) => {
+    const { id } = req.body;
+    await courseController.deleteCourse({ id, title, description });
+
+    res.send({ success: true });
+  })
+);
 
 module.exports = router;

@@ -37,7 +37,7 @@ exports.login = async ({ email, password }) => {
   const [record] = await knex("users")
     .select("id", "password as hashedPassword")
     .where({
-      email,
+      email
     });
 
   if (!record) {
@@ -48,7 +48,7 @@ exports.login = async ({ email, password }) => {
   const [active] = await knex("users")
     .select("active")
     .where({
-      login,
+      email,
     });
 
   if (!active) {
